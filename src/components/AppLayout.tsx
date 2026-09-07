@@ -54,7 +54,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
+function SidebarBody({ onNavigate }: { onNavigate?: (() => void) | undefined }) {
   return (
     <div className="flex h-full flex-col gap-6 bg-sidebar p-4">
       <div className="flex items-center gap-3 px-1 pt-2">
