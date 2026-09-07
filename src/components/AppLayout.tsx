@@ -24,7 +24,7 @@ const ROLE_NAV: Record<Role, string[]> = {
   admin: ["/", "/library", "/teacher-requests"],
 };
 
-function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
+function NavLinks({ onNavigate }: { onNavigate?: (() => void) | undefined }) {
   const { role } = useStore();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const items = NAV.filter((item) => ROLE_NAV[role].includes(item.to));
