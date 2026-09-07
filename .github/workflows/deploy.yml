@@ -27,10 +27,15 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
+      - name: Prepare static output
+        run: |
+          cp dist/client/index.html dist/client/404.html
+          touch dist/client/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: dist/client
+
 
   deploy:
     needs: build
