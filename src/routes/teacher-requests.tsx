@@ -29,13 +29,13 @@ import type { Teacher } from "@/lib/college-data";
 export const Route = createFileRoute("/teacher-requests")({
   head: () => ({
     meta: [
-      { title: "Teacher Free-Period Requests — Campus Desk" },
+      { title: "Teacher Free-Period Requests — MMC Hetauda BICTE Portal" },
       {
         name: "description",
         content:
           "See which teachers are free this period and request a class cover, or review incoming requests.",
       },
-      { property: "og:title", content: "Teacher Free-Period Requests — Campus Desk" },
+      { property: "og:title", content: "Teacher Free-Period Requests — MMC Hetauda BICTE Portal" },
       {
         property: "og:description",
         content: "Request a free teacher for your class period and track the response.",

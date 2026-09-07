@@ -12,7 +12,14 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
     // Static prototype: prerender every page so the build can be hosted on GitHub Pages.
-    pages: [{ path: "/" }, { path: "/library" }, { path: "/teacher-requests" }],
+    pages: [
+      { path: "/" },
+      { path: "/login" },
+      { path: "/dashboard" },
+      { path: "/library" },
+      { path: "/teacher-requests" },
+      { path: "/identity-card" },
+    ],
     prerender: { enabled: true, autoStaticPathsDiscovery: false },
   },
 });
