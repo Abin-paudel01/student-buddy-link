@@ -10,7 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as IdentityCardRouteImport } from './routes/identity-card'
 import { Route as LibraryRouteImport } from './routes/library'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as TeacherRequestsRouteImport } from './routes/teacher-requests'
 
 const IndexRoute = IndexRouteImport.update({
@@ -18,9 +21,24 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IdentityCardRoute = IdentityCardRouteImport.update({
+  id: '/identity-card',
+  path: '/identity-card',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LibraryRoute = LibraryRouteImport.update({
   id: '/library',
   path: '/library',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TeacherRequestsRoute = TeacherRequestsRouteImport.update({
@@ -31,31 +49,62 @@ const TeacherRequestsRoute = TeacherRequestsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/identity-card': typeof IdentityCardRoute
   '/library': typeof LibraryRoute
+  '/login': typeof LoginRoute
   '/teacher-requests': typeof TeacherRequestsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/identity-card': typeof IdentityCardRoute
   '/library': typeof LibraryRoute
+  '/login': typeof LoginRoute
   '/teacher-requests': typeof TeacherRequestsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/identity-card': typeof IdentityCardRoute
   '/library': typeof LibraryRoute
+  '/login': typeof LoginRoute
   '/teacher-requests': typeof TeacherRequestsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/library' | '/teacher-requests'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/identity-card'
+    | '/library'
+    | '/login'
+    | '/teacher-requests'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/library' | '/teacher-requests'
-  id: '__root__' | '/' | '/library' | '/teacher-requests'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/identity-card'
+    | '/library'
+    | '/login'
+    | '/teacher-requests'
+  id:
+    | '__root__'
+    | '/'
+    | '/dashboard'
+    | '/identity-card'
+    | '/library'
+    | '/login'
+    | '/teacher-requests'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DashboardRoute: typeof DashboardRoute
+  IdentityCardRoute: typeof IdentityCardRoute
   LibraryRoute: typeof LibraryRoute
+  LoginRoute: typeof LoginRoute
   TeacherRequestsRoute: typeof TeacherRequestsRoute
 }
 
@@ -68,11 +117,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/identity-card': {
+      id: '/identity-card'
+      path: '/identity-card'
+      fullPath: '/identity-card'
+      preLoaderRoute: typeof IdentityCardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/library': {
       id: '/library'
       path: '/library'
       fullPath: '/library'
       preLoaderRoute: typeof LibraryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/teacher-requests': {
@@ -87,7 +157,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DashboardRoute: DashboardRoute,
+  IdentityCardRoute: IdentityCardRoute,
   LibraryRoute: LibraryRoute,
+  LoginRoute: LoginRoute,
   TeacherRequestsRoute: TeacherRequestsRoute,
 }
 export const routeTree = rootRouteImport

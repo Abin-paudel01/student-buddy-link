@@ -1,27 +1,37 @@
-import { Link, useRouterState } from "@tanstack/react-router";
-import { BookOpen, CalendarClock, GraduationCap, LayoutDashboard, Menu } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import {
+  BookOpen,
+  CalendarClock,
+  GraduationCap,
+  IdCard,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+} from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/app-store";
-import { CURRENT_CLASS, CURRENT_STUDENT, ROLE_LABELS, type Role } from "@/lib/college-data";
+import { COLLEGE_SHORT, PROGRAM, ROLE_LABELS, type Role } from "@/lib/college-data";
 import { cn } from "@/lib/utils";
 
-type NavItem = { to: "/" | "/library" | "/teacher-requests"; label: string; icon: typeof BookOpen };
+type NavPath = "/dashboard" | "/library" | "/teacher-requests" | "/identity-card";
+type NavItem = { to: NavPath; label: string; icon: typeof BookOpen };
 
 const NAV: NavItem[] = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/library", label: "Library", icon: BookOpen },
   { to: "/teacher-requests", label: "Teacher Requests", icon: CalendarClock },
+  { to: "/identity-card", label: "Identity Card", icon: IdCard },
 ];
 
-const ROLE_NAV: Record<Role, string[]> = {
-  student: ["/", "/library", "/teacher-requests"],
-  teacher: ["/", "/teacher-requests"],
-  librarian: ["/", "/library"],
-  admin: ["/", "/library", "/teacher-requests"],
+const ROLE_NAV: Record<Role, NavPath[]> = {
+  student: ["/dashboard", "/library", "/teacher-requests", "/identity-card"],
+  teacher: ["/dashboard", "/teacher-requests"],
+  librarian: ["/dashboard", "/library"],
+  admin: ["/dashboard", "/library", "/teacher-requests", "/identity-card"],
 };
 
 function NavLinks({ onNavigate }: { onNavigate?: (() => void) | undefined }) {
@@ -39,9 +49,9 @@ function NavLinks({ onNavigate }: { onNavigate?: (() => void) | undefined }) {
             to={to}
             onClick={onNavigate}
             className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+              "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
               active
-                ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                ? "bg-gradient-to-r from-sidebar-primary to-accent text-sidebar-primary-foreground shadow-lg shadow-black/20"
                 : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
             )}
           >
@@ -55,22 +65,45 @@ function NavLinks({ onNavigate }: { onNavigate?: (() => void) | undefined }) {
 }
 
 function SidebarBody({ onNavigate }: { onNavigate?: (() => void) | undefined }) {
+  const { user, logout } = useStore();
+  const navigate = useNavigate();
+
   return (
     <div className="flex h-full flex-col gap-6 bg-sidebar p-4">
-      <div className="flex items-center gap-3 px-1 pt-2">
-        <span className="flex size-10 items-center justify-center rounded-xl bg-sidebar-primary text-sidebar-primary-foreground">
+      <Link to="/" className="flex items-center gap-3 px-1 pt-2" onClick={onNavigate}>
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-sidebar-primary to-accent text-sidebar-primary-foreground">
           <GraduationCap className="size-5" />
         </span>
-        <div>
-          <p className="font-display text-base leading-tight font-semibold text-sidebar-accent-foreground">
-            Campus Desk
+        <div className="min-w-0">
+          <p className="font-display truncate text-base leading-tight font-bold text-sidebar-accent-foreground">
+            {COLLEGE_SHORT}
           </p>
-          <p className="text-xs text-sidebar-foreground/70">College Support Portal</p>
+          <p className="truncate text-xs text-sidebar-foreground/70">{PROGRAM} Support Portal</p>
         </div>
-      </div>
+      </Link>
+
       <NavLinks onNavigate={onNavigate} />
-      <div className="mt-auto rounded-lg bg-sidebar-accent p-3 text-xs text-sidebar-accent-foreground/80">
-        Prototype only — all data is mock data stored in the browser session.
+
+      <div className="mt-auto space-y-3">
+        <div className="rounded-xl bg-sidebar-accent p-3">
+          <p className="truncate text-sm font-semibold text-sidebar-accent-foreground">
+            {user?.name}
+          </p>
+          <p className="truncate text-xs text-sidebar-foreground/70">
+            {ROLE_LABELS[user?.role ?? "student"]}
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          className="w-full border-sidebar-border bg-transparent text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          onClick={() => {
+            onNavigate?.();
+            logout();
+            void navigate({ to: "/login" });
+          }}
+        >
+          <LogOut className="size-4" /> Sign out
+        </Button>
       </div>
     </div>
   );
@@ -85,8 +118,15 @@ export function AppLayout({
   description: string;
   children: ReactNode;
 }) {
-  const { role, setRole, activeTeacherId, setActiveTeacherId, teachers } = useStore();
+  const { user, role, activeTeacherId, setActiveTeacherId, teachers } = useStore();
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) void navigate({ to: "/login" });
+  }, [user, navigate]);
+
+  if (!user) return null;
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -97,7 +137,7 @@ export function AppLayout({
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 flex flex-wrap items-center gap-3 border-b border-border bg-background/90 px-4 py-3 backdrop-blur sm:px-6">
+        <header className="sticky top-0 z-20 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b border-border bg-card/85 px-4 py-3 backdrop-blur sm:px-6">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="lg:hidden" aria-label="Open menu">
@@ -109,52 +149,39 @@ export function AppLayout({
               <SidebarBody onNavigate={() => setOpen(false)} />
             </SheetContent>
           </Sheet>
+          <span className="hidden lg:block" />
 
-          <div className="mr-auto min-w-0">
-            <p className="truncate text-sm font-semibold text-foreground">
-              {role === "student" ? CURRENT_STUDENT : ROLE_LABELS[role]}
-            </p>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-foreground">{user.name}</p>
             <p className="truncate text-xs text-muted-foreground">
-              {role === "student"
-                ? CURRENT_CLASS
-                : role === "teacher"
-                  ? teachers.find((t) => t.teacher_id === activeTeacherId)?.subject
-                  : "Staff view"}
+              {ROLE_LABELS[role]} • {COLLEGE_SHORT}
             </p>
           </div>
 
-          {role === "teacher" && (
-            <Select value={activeTeacherId} onValueChange={setActiveTeacherId}>
-              <SelectTrigger className="w-[190px]" aria-label="Select teacher profile">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {teachers.map((t) => (
-                  <SelectItem key={t.teacher_id} value={t.teacher_id}>
-                    {t.teacher_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-
-          <Select value={role} onValueChange={(v) => setRole(v as Role)}>
-            <SelectTrigger className="w-[150px]" aria-label="Select role">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {(Object.keys(ROLE_LABELS) as Role[]).map((r) => (
-                <SelectItem key={r} value={r}>
-                  {ROLE_LABELS[r]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex items-center gap-2">
+            {role === "teacher" && (
+              <Select value={activeTeacherId} onValueChange={setActiveTeacherId}>
+                <SelectTrigger className="w-[170px]" aria-label="Select teacher profile">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {teachers.map((t) => (
+                    <SelectItem key={t.teacher_id} value={t.teacher_id}>
+                      {t.teacher_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            <span className="hidden rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground sm:inline">
+              {PROGRAM}
+            </span>
+          </div>
         </header>
 
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8">
           <div className="mb-6">
-            <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h1>
+            <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">{title}</h1>
             <p className="mt-1 text-sm text-muted-foreground">{description}</p>
           </div>
           {children}

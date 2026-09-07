@@ -37,13 +37,13 @@ import { SUBJECTS, type Book, type BookStatus } from "@/lib/college-data";
 export const Route = createFileRoute("/library")({
   head: () => ({
     meta: [
-      { title: "Library Catalogue — Campus Desk" },
+      { title: "Library Catalogue — MMC Hetauda BICTE Portal" },
       {
         name: "description",
         content:
           "Search the college library catalogue, check book availability and track book requests.",
       },
-      { property: "og:title", content: "Library Catalogue — Campus Desk" },
+      { property: "og:title", content: "Library Catalogue — MMC Hetauda BICTE Portal" },
       {
         property: "og:description",
         content: "Search books, check availability and manage library requests.",
